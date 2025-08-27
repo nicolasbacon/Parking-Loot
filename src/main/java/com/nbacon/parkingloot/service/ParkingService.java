@@ -9,9 +9,11 @@ import com.nbacon.parkingloot.domain.model.vehicle.Vehicle;
 import com.nbacon.parkingloot.dto.request.IncomingVehicle;
 import com.nbacon.parkingloot.dto.request.ParkingCreateRequest;
 import com.nbacon.parkingloot.dto.request.VehicleType;
+import com.nbacon.parkingloot.dto.response.ParkingLotInfosResponse;
 import com.nbacon.parkingloot.repository.ParkingRepository;
 import com.nbacon.parkingloot.repository.SpotRepository;
 import com.nbacon.parkingloot.repository.VehicleRepository;
+import com.nbacon.parkingloot.repository.dto.ParkingLotInfos;
 import com.nbacon.parkingloot.service.policy.SpotSelectionRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,10 +29,6 @@ public class ParkingService {
     private final SpotSelectionRegistry spotSelectionRegistry;
     private final VehicleFactory vehicleFactory;
     private final VehicleRepository vehicleRepository;
-
-    public List<ParkingLot> getAllParkings() {
-        return parkingLotRepository.findAll();
-    }
 
     public ParkingLot create(ParkingCreateRequest request) {
         ParkingLot parkingLot = ParkingLot.builder()
@@ -60,5 +58,22 @@ public class ParkingService {
             spot.park(vehicle);
         }
         spotRepository.saveAll(allocation);
+    }
+
+    public ParkingLotInfosResponse getAllParkingInformation(long parkingLotId) {
+        parkingLotRepository.findById(parkingLotId)
+                .orElseThrow(() -> new ParkingNotFoundException(parkingLotId));
+
+        ParkingLotInfos infos = spotRepository.fetchParkingLotInfos(parkingLotId);
+
+        return new ParkingLotInfosResponse(
+                infos.nbSpotRemaining(),
+                infos.totalNbSpot(),
+                infos.isFull(),
+                infos.isEmpty(),
+                infos.typesOfSeatsFullyAssigned(),
+                infos.numberOfSpotsVansAssigned()
+        );
+
     }
 }
