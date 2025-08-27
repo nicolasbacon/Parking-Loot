@@ -17,6 +17,7 @@ public abstract class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String licensePlate;
 
     public Vehicle(String licensePlate) {

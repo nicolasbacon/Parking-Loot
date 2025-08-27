@@ -1,6 +1,7 @@
 package com.nbacon.parkingloot.controller;
 
 import com.nbacon.parkingloot.dto.request.IncomingVehicle;
+import com.nbacon.parkingloot.dto.request.OutgoingVehicle;
 import com.nbacon.parkingloot.dto.request.ParkingCreateRequest;
 import com.nbacon.parkingloot.dto.response.ParkingLotInfosResponse;
 import com.nbacon.parkingloot.service.ParkingService;
@@ -35,6 +36,11 @@ public class ParkingController {
     @PostMapping("/park")
     public void park(@RequestBody @Valid IncomingVehicle vehicle) {
         parkingService.park(vehicle);
+    }
+
+    @PostMapping("/leave")
+    public void leave(@RequestBody @Valid OutgoingVehicle vehicle) {
+        parkingService.leave(vehicle);
     }
 
 }

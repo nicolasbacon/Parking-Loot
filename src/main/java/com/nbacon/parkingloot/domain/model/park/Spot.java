@@ -36,7 +36,7 @@ public abstract class Spot {
     @JoinColumn(name = "PARKING_LOT_ID")
     private ParkingLot parkingLot;
 
-    public void park(Vehicle vehicle) {
+    public void assignTo(Vehicle vehicle) {
         if (this.occupied) {
             throw new NoAvailableSpotException(vehicle.getClass().getSimpleName());
         }
@@ -44,7 +44,7 @@ public abstract class Spot {
         this.occupied = true;
     }
 
-    public void leave() {
+    public void release() {
         if (!this.occupied) {
             throw new AlreadyFreeSpotException();
         }

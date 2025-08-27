@@ -8,6 +8,7 @@ import com.nbacon.parkingloot.domain.model.park.Spot;
 import com.nbacon.parkingloot.domain.model.vehicle.Vehicle;
 import com.nbacon.parkingloot.domain.model.vehicle.VehicleType;
 import com.nbacon.parkingloot.dto.request.IncomingVehicle;
+import com.nbacon.parkingloot.dto.request.OutgoingVehicle;
 import com.nbacon.parkingloot.dto.request.ParkingCreateRequest;
 import com.nbacon.parkingloot.dto.response.ParkingLotInfosResponse;
 import com.nbacon.parkingloot.repository.ParkingRepository;
@@ -15,6 +16,7 @@ import com.nbacon.parkingloot.repository.SpotRepository;
 import com.nbacon.parkingloot.repository.VehicleRepository;
 import com.nbacon.parkingloot.repository.dto.ParkingLotInfos;
 import com.nbacon.parkingloot.service.policy.SpotSelectionRegistry;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +32,13 @@ public class ParkingService {
     private final VehicleFactory vehicleFactory;
     private final VehicleRepository vehicleRepository;
 
-    public ParkingLot create(ParkingCreateRequest request) {
+    public void create(ParkingCreateRequest request) {
         ParkingLot parkingLot = ParkingLot.builder()
                 .nbMotorcycleSpot(request.nbMotorcycleSpot())
                 .nbCarSpot(request.nbCarSpot())
                 .nbLargeSpot(request.nbLargeSpot())
                 .build();
-        return parkingLotRepository.save(parkingLot);
+        parkingLotRepository.save(parkingLot);
     }
 
     @Transactional
@@ -55,7 +57,7 @@ public class ParkingService {
         vehicleRepository.save(vehicle);
 
         for (Spot spot : allocation) {
-            spot.park(vehicle);
+            spot.assignTo(vehicle);
         }
         spotRepository.saveAll(allocation);
     }
@@ -76,5 +78,15 @@ public class ParkingService {
                 infos.numberOfSpotsVansAssigned()
         );
 
+    }
+
+    @Transactional
+    public void leave(@Valid OutgoingVehicle outgoingVehicle) {
+        Vehicle vehicle = vehicleRepository.findFirstByLicensePlate(outgoingVehicle.licensePlate());
+        List<Spot> spots = spotRepository.findAllByVehicle(vehicle);
+        for (Spot spot : spots) {
+            spot.release();
+        }
+        vehicleRepository.delete(vehicle);
     }
 }

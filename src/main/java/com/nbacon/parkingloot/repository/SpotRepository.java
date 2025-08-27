@@ -2,6 +2,7 @@ package com.nbacon.parkingloot.repository;
 
 import com.nbacon.parkingloot.domain.model.park.ParkingLot;
 import com.nbacon.parkingloot.domain.model.park.Spot;
+import com.nbacon.parkingloot.domain.model.vehicle.Vehicle;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.PageRequest;
@@ -72,4 +73,6 @@ public interface SpotRepository extends JpaRepository<Spot, Long>, SpotRepositor
     default List<Spot> lockThreeConsecutiveBySpotType(long parkingLotId, Class<? extends Spot> type) {
         return lockThreeConsecutiveBySpotType(parkingLotId, resolveDiscriminator(type));
     }
+
+    List<Spot> findAllByVehicle(Vehicle vehicle);
 }
