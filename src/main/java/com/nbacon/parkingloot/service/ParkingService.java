@@ -2,6 +2,7 @@ package com.nbacon.parkingloot.service;
 
 import com.nbacon.parkingloot.domain.exception.NoAvailableSpotException;
 import com.nbacon.parkingloot.domain.exception.ParkingNotFoundException;
+import com.nbacon.parkingloot.domain.exception.VehicleNotFoundException;
 import com.nbacon.parkingloot.domain.factory.VehicleFactory;
 import com.nbacon.parkingloot.domain.model.park.ParkingLot;
 import com.nbacon.parkingloot.domain.model.park.Spot;
@@ -83,6 +84,9 @@ public class ParkingService {
     @Transactional
     public void leave(@Valid OutgoingVehicle outgoingVehicle) {
         Vehicle vehicle = vehicleRepository.findFirstByLicensePlate(outgoingVehicle.licensePlate());
+        if (vehicle == null) {
+            throw new VehicleNotFoundException("Vehicle not found");
+        }
         List<Spot> spots = spotRepository.findAllByVehicle(vehicle);
         for (Spot spot : spots) {
             spot.release();

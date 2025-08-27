@@ -6,6 +6,6 @@ public record OutgoingVehicle(
         @NotBlank String licensePlate
 ) {
     public OutgoingVehicle {
-        licensePlate = licensePlate == null ? null : licensePlate.trim();
+        licensePlate = licensePlate.trim();
     }
 }

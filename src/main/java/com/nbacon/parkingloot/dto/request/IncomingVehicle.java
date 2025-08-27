@@ -9,8 +9,8 @@ public record IncomingVehicle(
         @NotNull Long parkingLotId
 ) {
     public IncomingVehicle {
-        vehicleType = vehicleType == null ? null : vehicleType.trim();
-        licensePlate = licensePlate == null ? null : licensePlate.trim();
+        vehicleType = vehicleType.trim();
+        licensePlate = licensePlate.trim();
     }
 }
 
