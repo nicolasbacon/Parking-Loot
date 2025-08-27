@@ -1,12 +1,14 @@
 package com.nbacon.parkingloot.controller;
 
-import com.nbacon.parkingloot.domain.model.park.ParkingLot;
 import com.nbacon.parkingloot.dto.request.IncomingVehicle;
 import com.nbacon.parkingloot.dto.request.ParkingCreateRequest;
 import com.nbacon.parkingloot.dto.response.ParkingLotInfosResponse;
 import com.nbacon.parkingloot.service.ParkingService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,12 +27,13 @@ class ParkingController {
     }
 
     @PostMapping("/create")
-    public ParkingLot create(@RequestBody ParkingCreateRequest request) {
-        return parkingService.create(request);
+    public ResponseEntity<Object> create(@RequestBody @Valid ParkingCreateRequest request) {
+        parkingService.create(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/park")
-    public void park(@RequestBody IncomingVehicle vehicle) {
+    public void park(@RequestBody @Valid IncomingVehicle vehicle) {
         parkingService.park(vehicle);
     }
 
