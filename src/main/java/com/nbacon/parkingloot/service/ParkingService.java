@@ -12,7 +12,6 @@ import com.nbacon.parkingloot.dto.request.VehicleType;
 import com.nbacon.parkingloot.repository.ParkingRepository;
 import com.nbacon.parkingloot.repository.SpotRepository;
 import com.nbacon.parkingloot.repository.VehicleRepository;
-import com.nbacon.parkingloot.service.policy.SpotAllocation;
 import com.nbacon.parkingloot.service.policy.SpotSelectionRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,15 +50,15 @@ public class ParkingService {
                 .orElseThrow(() -> new ParkingNotFoundException(incomingVehicle.parkingLotId()));
 
 
-        SpotAllocation allocation = spotSelectionRegistry.getPolicy(type)
+        List<Spot> allocation = spotSelectionRegistry.getPolicy(type)
                 .selectAllocation(parkingLot)
                 .orElseThrow(() -> new NoAvailableSpotException(type.value));
 
         vehicleRepository.save(vehicle);
 
-        for (Spot spot : allocation.spots()) {
+        for (Spot spot : allocation) {
             spot.park(vehicle);
         }
-        spotRepository.saveAll(allocation.spots());
+        spotRepository.saveAll(allocation);
     }
 }
