@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 public class ParkingLot {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(mappedBy = "parkingLot", cascade = CascadeType.ALL, orphanRemoval = true)

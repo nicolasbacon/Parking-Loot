@@ -19,7 +19,7 @@ import lombok.Setter;
 public abstract class Spot {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private boolean occupied;

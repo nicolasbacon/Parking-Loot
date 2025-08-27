@@ -1,10 +1,6 @@
 package com.nbacon.parkingloot.domain.factory;
 
-import com.nbacon.parkingloot.domain.model.vehicle.Car;
-import com.nbacon.parkingloot.domain.model.vehicle.Motorcycle;
-import com.nbacon.parkingloot.domain.model.vehicle.Van;
-import com.nbacon.parkingloot.domain.model.vehicle.Vehicle;
-import com.nbacon.parkingloot.dto.request.VehicleType;
+import com.nbacon.parkingloot.domain.model.vehicle.*;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;

@@ -1,6 +1,6 @@
 package com.nbacon.parkingloot.service.policy;
 
-import com.nbacon.parkingloot.dto.request.VehicleType;
+import com.nbacon.parkingloot.domain.model.vehicle.VehicleType;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;

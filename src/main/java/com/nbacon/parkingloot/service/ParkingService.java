@@ -6,9 +6,9 @@ import com.nbacon.parkingloot.domain.factory.VehicleFactory;
 import com.nbacon.parkingloot.domain.model.park.ParkingLot;
 import com.nbacon.parkingloot.domain.model.park.Spot;
 import com.nbacon.parkingloot.domain.model.vehicle.Vehicle;
+import com.nbacon.parkingloot.domain.model.vehicle.VehicleType;
 import com.nbacon.parkingloot.dto.request.IncomingVehicle;
 import com.nbacon.parkingloot.dto.request.ParkingCreateRequest;
-import com.nbacon.parkingloot.dto.request.VehicleType;
 import com.nbacon.parkingloot.dto.response.ParkingLotInfosResponse;
 import com.nbacon.parkingloot.repository.ParkingRepository;
 import com.nbacon.parkingloot.repository.SpotRepository;
@@ -50,7 +50,7 @@ public class ParkingService {
 
         List<Spot> allocation = spotSelectionRegistry.getPolicy(type)
                 .selectAllocation(parkingLot)
-                .orElseThrow(() -> new NoAvailableSpotException(type.value));
+                .orElseThrow(() -> new NoAvailableSpotException(type.name()));
 
         vehicleRepository.save(vehicle);
 

@@ -2,7 +2,7 @@ package com.nbacon.parkingloot.service.policy;
 
 import com.nbacon.parkingloot.domain.model.park.ParkingLot;
 import com.nbacon.parkingloot.domain.model.park.Spot;
-import com.nbacon.parkingloot.dto.request.VehicleType;
+import com.nbacon.parkingloot.domain.model.vehicle.VehicleType;
 
 import java.util.List;
 import java.util.Optional;

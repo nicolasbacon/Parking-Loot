@@ -4,7 +4,7 @@ import com.nbacon.parkingloot.domain.model.park.CarSpot;
 import com.nbacon.parkingloot.domain.model.park.LargeSpot;
 import com.nbacon.parkingloot.domain.model.park.ParkingLot;
 import com.nbacon.parkingloot.domain.model.park.Spot;
-import com.nbacon.parkingloot.dto.request.VehicleType;
+import com.nbacon.parkingloot.domain.model.vehicle.VehicleType;
 import com.nbacon.parkingloot.repository.SpotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
