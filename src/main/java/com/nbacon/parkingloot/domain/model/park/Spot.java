@@ -10,6 +10,10 @@ import lombok.Setter;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "SPOT_TYPE")
+@Table(name = "SPOT", indexes = {
+        @Index(name = "idx_spot_type_occupied_parking_position",
+                columnList = "spot_type, occupied, parking_lot_id, position")
+})
 @Getter
 @Setter
 public abstract class Spot {
@@ -22,7 +26,7 @@ public abstract class Spot {
 
     private int position;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Vehicle vehicle;
 
     @ManyToOne

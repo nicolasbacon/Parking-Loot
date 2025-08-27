@@ -17,9 +17,11 @@ public class ParkingLot {
     @Id
     @GeneratedValue
     private Long id;
+
     @OneToMany(mappedBy = "parkingLot", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Spot> spots = new ArrayList<>();
+
     private int nbMotorcycleSpot;
     private int nbCarSpot;
     private int nbLargeSpot;

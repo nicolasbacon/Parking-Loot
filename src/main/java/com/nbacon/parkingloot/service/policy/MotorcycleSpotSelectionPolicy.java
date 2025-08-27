@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class MotocycleSpotSelectionPolicy implements SpotSelectionPolicy {
+public class MotorcycleSpotSelectionPolicy implements SpotSelectionPolicy {
     private final SpotRepository spotRepository;
 
     @Override
