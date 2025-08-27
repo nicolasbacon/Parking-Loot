@@ -1,4 +1,4 @@
-package com.nbacon.parkingloot.exception;
+package com.nbacon.parkingloot.domain.exception;
 
 public class NoAvailableSpotException extends RuntimeException {
     public NoAvailableSpotException(String type) {

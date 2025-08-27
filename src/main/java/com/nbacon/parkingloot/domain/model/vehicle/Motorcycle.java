@@ -1,4 +1,4 @@
-package com.nbacon.parkingloot.model.vehicle;
+package com.nbacon.parkingloot.domain.model.vehicle;
 
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Car extends Vehicle {
-    public Car(String licensePlate) {
+public class Motorcycle extends Vehicle {
+    public Motorcycle(String licensePlate) {
         super(licensePlate);
     }
 }

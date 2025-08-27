@@ -1,17 +1,17 @@
 package com.nbacon.parkingloot.service;
 
+import com.nbacon.parkingloot.domain.exception.NoAvailableSpotException;
+import com.nbacon.parkingloot.domain.exception.ParkingNotFoundException;
+import com.nbacon.parkingloot.domain.factory.VehicleFactory;
+import com.nbacon.parkingloot.domain.model.park.ParkingLot;
+import com.nbacon.parkingloot.domain.model.park.Spot;
+import com.nbacon.parkingloot.domain.model.vehicle.Vehicle;
 import com.nbacon.parkingloot.dto.request.IncomingVehicle;
 import com.nbacon.parkingloot.dto.request.ParkingCreateRequest;
 import com.nbacon.parkingloot.dto.request.VehicleType;
-import com.nbacon.parkingloot.exception.NoAvailableSpotException;
-import com.nbacon.parkingloot.exception.ParkingNotFoundException;
-import com.nbacon.parkingloot.model.park.ParkingLot;
-import com.nbacon.parkingloot.model.park.Spot;
-import com.nbacon.parkingloot.model.vehicle.Car;
-import com.nbacon.parkingloot.model.vehicle.Motorcycle;
-import com.nbacon.parkingloot.model.vehicle.Van;
-import com.nbacon.parkingloot.model.vehicle.Vehicle;
-import com.nbacon.parkingloot.repository.*;
+import com.nbacon.parkingloot.repository.ParkingRepository;
+import com.nbacon.parkingloot.repository.SpotRepository;
+import com.nbacon.parkingloot.repository.VehicleRepository;
 import com.nbacon.parkingloot.service.policy.SpotAllocation;
 import com.nbacon.parkingloot.service.policy.SpotSelectionRegistry;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +26,8 @@ public class ParkingService {
     private final ParkingRepository parkingLotRepository;
     private final SpotRepository spotRepository;
     private final SpotSelectionRegistry spotSelectionRegistry;
+    private final VehicleFactory vehicleFactory;
+    private final VehicleRepository vehicleRepository;
 
     public List<ParkingLot> getAllParkings() {
         return parkingLotRepository.findAll();
@@ -33,29 +35,27 @@ public class ParkingService {
 
     public ParkingLot create(ParkingCreateRequest request) {
         ParkingLot parkingLot = ParkingLot.builder()
-                .nbMotorcycleSpot(request.getNbMotorcycleSpot())
-                .nbCarSpot(request.getNbCarSpot())
-                .nbLargeSpot(request.getNbLargeSpot())
+                .nbMotorcycleSpot(request.nbMotorcycleSpot())
+                .nbCarSpot(request.nbCarSpot())
+                .nbLargeSpot(request.nbLargeSpot())
                 .build();
         return parkingLotRepository.save(parkingLot);
     }
 
     @Transactional
     public void park(IncomingVehicle incomingVehicle) {
-        VehicleType type = VehicleType.fromString(incomingVehicle.getVehicleType());
-        Vehicle vehicle = switch (type) {
-            case CAR -> new Car(incomingVehicle.getLicensePlate());
-            case MOTORCYCLE -> new Motorcycle(incomingVehicle.getLicensePlate());
-            case VAN -> new Van(incomingVehicle.getLicensePlate());
-        };
+        VehicleType type = VehicleType.fromString(incomingVehicle.vehicleType());
+        Vehicle vehicle = vehicleFactory.createVehicle(type, incomingVehicle.licensePlate());
 
-        ParkingLot parkingLot = parkingLotRepository.findById(incomingVehicle.getParkingLotId())
-                .orElseThrow(() -> new ParkingNotFoundException(incomingVehicle.getParkingLotId()));
+        ParkingLot parkingLot = parkingLotRepository.findById(incomingVehicle.parkingLotId())
+                .orElseThrow(() -> new ParkingNotFoundException(incomingVehicle.parkingLotId()));
 
 
         SpotAllocation allocation = spotSelectionRegistry.getPolicy(type)
                 .selectAllocation(parkingLot)
                 .orElseThrow(() -> new NoAvailableSpotException(type.value));
+
+        vehicleRepository.save(vehicle);
 
         for (Spot spot : allocation.spots()) {
             spot.park(vehicle);

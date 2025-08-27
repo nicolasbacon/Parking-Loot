@@ -1,11 +1,10 @@
 package com.nbacon.parkingloot.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.PositiveOrZero;
 
-@Getter @Setter
-public class ParkingCreateRequest {
-        private int nbMotorcycleSpot;
-        private int nbCarSpot;
-        private int nbLargeSpot;
+public record ParkingCreateRequest(
+        @PositiveOrZero int nbMotorcycleSpot,
+        @PositiveOrZero int nbCarSpot,
+        @PositiveOrZero int nbLargeSpot
+) {
 }

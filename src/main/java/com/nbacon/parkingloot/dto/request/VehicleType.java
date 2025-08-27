@@ -1,6 +1,6 @@
 package com.nbacon.parkingloot.dto.request;
 
-import com.nbacon.parkingloot.exception.VehicleTypeNotFoundException;
+import com.nbacon.parkingloot.domain.exception.VehicleTypeNotFoundException;
 
 public enum VehicleType {
     CAR("CAR"),
@@ -25,5 +25,4 @@ public enum VehicleType {
         }
         throw new VehicleTypeNotFoundException(value);
     }
-
 }

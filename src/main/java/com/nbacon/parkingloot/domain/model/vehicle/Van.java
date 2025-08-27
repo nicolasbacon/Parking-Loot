@@ -1,4 +1,4 @@
-package com.nbacon.parkingloot.model.vehicle;
+package com.nbacon.parkingloot.domain.model.vehicle;
 
 import jakarta.persistence.Entity;
 import lombok.Getter;

@@ -1,10 +1,11 @@
 package com.nbacon.parkingloot.service.policy;
 
+import com.nbacon.parkingloot.domain.model.park.CarSpot;
+import com.nbacon.parkingloot.domain.model.park.LargeSpot;
+import com.nbacon.parkingloot.domain.model.park.ParkingLot;
+import com.nbacon.parkingloot.domain.model.park.Spot;
 import com.nbacon.parkingloot.dto.request.VehicleType;
-import com.nbacon.parkingloot.model.park.ParkingLot;
-import com.nbacon.parkingloot.model.park.Spot;
-import com.nbacon.parkingloot.repository.CarSpotRepository;
-import com.nbacon.parkingloot.repository.LargeSpotRepository;
+import com.nbacon.parkingloot.repository.SpotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +15,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class CarSpotSelectionPolicy implements SpotSelectionPolicy {
-    private final CarSpotRepository carSpotRepository;
-    private final LargeSpotRepository largeSpotRepository;
+    private final SpotRepository spotRepository;
 
 
     @Override
@@ -25,13 +25,13 @@ public class CarSpotSelectionPolicy implements SpotSelectionPolicy {
 
     @Override
     public Optional<SpotAllocation> selectAllocation(ParkingLot parkingLot) {
-        Optional<Spot> carSpot = carSpotRepository.findByOccupiedFalseAndParkingLot(parkingLot)
-                .stream().findFirst().map(Spot.class::cast);
+        Optional<Spot> carSpot = spotRepository.findFreeSpotsByTypeOrderByPosition(CarSpot.class, parkingLot)
+                .stream().findFirst();
         if (carSpot.isPresent()) {
             return Optional.of(new SpotAllocation(List.of(carSpot.get())));
         }
-        Optional<Spot> largeSpot = largeSpotRepository.findByOccupiedFalseAndParkingLot(parkingLot)
-                .stream().findFirst().map(Spot.class::cast);
+        Optional<Spot> largeSpot = spotRepository.findFreeSpotsByTypeOrderByPosition(LargeSpot.class, parkingLot)
+                .stream().findFirst();
         return largeSpot.map(spot -> new SpotAllocation(List.of(spot)));
     }
 }

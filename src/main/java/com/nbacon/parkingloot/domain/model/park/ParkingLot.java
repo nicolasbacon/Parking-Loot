@@ -1,6 +1,5 @@
-package com.nbacon.parkingloot.model.park;
+package com.nbacon.parkingloot.domain.model.park;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,7 +18,6 @@ public class ParkingLot {
     @GeneratedValue
     private Long id;
     @OneToMany(mappedBy = "parkingLot", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @Builder.Default
     private List<Spot> spots = new ArrayList<>();
     private int nbMotorcycleSpot;
@@ -37,8 +35,8 @@ public class ParkingLot {
         for (int i = 0; i < nombre; i++) {
             Spot spot = constructeur.get();
             spot.setParkingLot(this);
+            spot.setPosition(i);
             this.spots.add(spot);
-
         }
     }
 }

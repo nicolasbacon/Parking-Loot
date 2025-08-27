@@ -1,8 +1,8 @@
-package com.nbacon.parkingloot.model.park;
+package com.nbacon.parkingloot.domain.model.park;
 
-import com.nbacon.parkingloot.exception.AlreadyFreeSpotException;
-import com.nbacon.parkingloot.exception.NoAvailableSpotException;
-import com.nbacon.parkingloot.model.vehicle.Vehicle;
+import com.nbacon.parkingloot.domain.exception.AlreadyFreeSpotException;
+import com.nbacon.parkingloot.domain.exception.NoAvailableSpotException;
+import com.nbacon.parkingloot.domain.model.vehicle.Vehicle;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +19,8 @@ public abstract class Spot {
     private Long id;
 
     private boolean occupied;
+
+    private int position;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Vehicle vehicle;

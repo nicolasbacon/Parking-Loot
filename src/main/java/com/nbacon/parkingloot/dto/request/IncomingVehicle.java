@@ -1,11 +1,16 @@
 package com.nbacon.parkingloot.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-@Getter @Setter
-public class IncomingVehicle {
-    private String vehicleType;
-    private String licensePlate;
-    private Long parkingLotId;
+public record IncomingVehicle(
+        @NotBlank String vehicleType,
+        @NotBlank String licensePlate,
+        @NotNull Long parkingLotId
+) {
+    public IncomingVehicle {
+        vehicleType = vehicleType == null ? null : vehicleType.trim();
+        licensePlate = licensePlate == null ? null : licensePlate.trim();
+    }
 }
+

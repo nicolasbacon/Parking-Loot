@@ -1,4 +1,4 @@
-package com.nbacon.parkingloot.exception;
+package com.nbacon.parkingloot.domain.exception;
 
 public class ParkingNotFoundException extends RuntimeException {
     public ParkingNotFoundException(Long parkingLotId) {

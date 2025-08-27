@@ -1,4 +1,4 @@
-package com.nbacon.parkingloot.exception;
+package com.nbacon.parkingloot.domain.exception;
 
 public class VehicleTypeNotFoundException extends RuntimeException {
     public VehicleTypeNotFoundException(String type) {

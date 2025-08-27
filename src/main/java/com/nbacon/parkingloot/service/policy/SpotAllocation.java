@@ -1,6 +1,6 @@
 package com.nbacon.parkingloot.service.policy;
 
-import com.nbacon.parkingloot.model.park.Spot;
+import com.nbacon.parkingloot.domain.model.park.Spot;
 
 import java.util.List;
 
