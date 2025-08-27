@@ -21,19 +21,15 @@ public class MotorcycleSpotSelectionPolicy implements SpotSelectionPolicy {
 
     @Override
     public Optional<List<Spot>> selectAllocation(ParkingLot parkingLot) {
-        Optional<Spot> motocycleSpot = spotRepository.findFreeSpotsByTypeOrderByPosition(MotorcycleSpot.class, parkingLot)
-                .stream()
-                .findFirst();
+        Optional<Spot> motocycleSpot = spotRepository.findFirstFreeSpotsByTypeOrderByPosition(MotorcycleSpot.class, parkingLot);
         if (motocycleSpot.isPresent()) {
             return Optional.of(List.of(motocycleSpot.get()));
         }
-        Optional<Spot> carSpot = spotRepository.findFreeSpotsByTypeOrderByPosition(CarSpot.class, parkingLot)
-                .stream().findFirst();
+        Optional<Spot> carSpot = spotRepository.findFirstFreeSpotsByTypeOrderByPosition(CarSpot.class, parkingLot);
         if (carSpot.isPresent()) {
             return Optional.of(List.of(carSpot.get()));
         }
-        Optional<Spot> largeSpot = spotRepository.findFreeSpotsByTypeOrderByPosition(LargeSpot.class, parkingLot)
-                .stream().findFirst();
+        Optional<Spot> largeSpot = spotRepository.findFirstFreeSpotsByTypeOrderByPosition(LargeSpot.class, parkingLot);
         return largeSpot.map(List::of);
     }
 }

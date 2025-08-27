@@ -60,6 +60,7 @@ public class ParkingService {
         spotRepository.saveAll(allocation);
     }
 
+    @Transactional(readOnly = true)
     public ParkingLotInfosResponse getAllParkingInformation(long parkingLotId) {
         parkingLotRepository.findById(parkingLotId)
                 .orElseThrow(() -> new ParkingNotFoundException(parkingLotId));

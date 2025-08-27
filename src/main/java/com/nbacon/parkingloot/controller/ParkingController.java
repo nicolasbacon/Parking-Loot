@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/parking")
 @RequiredArgsConstructor
-class ParkingController {
+public class ParkingController {
     private final ParkingService parkingService;
 
-    @RequestMapping("/infos/{parkingLotId}")
+    @GetMapping("/infos/{parkingLotId}")
     public ParkingLotInfosResponse infos(
             @PathVariable
             @Positive(message = "parkingLotId must be strictly positive")
