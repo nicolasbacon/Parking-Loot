@@ -11,7 +11,6 @@
     <groupId>com.nbacon</groupId>
     <artifactId>Parking-Loot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
     <name>Parking-Loot</name>
     <description>Parking-Loot</description>
     <url/>
@@ -29,6 +28,7 @@
     </scm>
     <properties>
         <java.version>24</java.version>
+        <mockito.version>5.17.0</mockito.version>
     </properties>
     <dependencies>
         <dependency>
@@ -62,15 +62,14 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.2.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -101,17 +100,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>properties</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>
@@ -119,9 +107,54 @@
                         -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
                     </argLine>
                 </configuration>
-
             </plugin>
-
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.6</version>
+                <configuration>
+                    <container>
+                        <mainClass>com.nbacon.parkingloot.ParkingLootApplication</mainClass>
+                        <ports>
+                            <port>8080</port>
+                        </ports>
+                    </container>
+                    <from>
+                        <image>eclipse-temurin:24-jre</image>
+                    </from>
+                    <to>
+                        <image>parking-loot:latest</image>
+                    </to>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>arm64</id>
+                        <goals>
+                            <goal>dockerBuild</goal>
+                        </goals>
+                        <configuration>
+                            <to>
+                                <image>parking-loot:arm64</image>
+                            </to>
+                            <from>
+                                <image>eclipse-temurin:24-jre</image>
+                                <platforms>
+                                    <platform>
+                                        <os>linux</os>
+                                        <architecture>arm64</architecture>
+                                    </platform>
+                                </platforms>
+                            </from>
+                            <container>
+                                <mainClass>com.nbacon.parkingloot.ParkingLootApplication</mainClass>
+                                <ports>
+                                    <port>8080</port>
+                                </ports>
+                            </container>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
