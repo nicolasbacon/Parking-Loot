@@ -1,5 +1,6 @@
 package com.nbacon.parkingloot.repository;
 
+import com.nbacon.parkingloot.domain.model.park.ParkingLot;
 import com.nbacon.parkingloot.domain.model.park.QSpot;
 import com.nbacon.parkingloot.domain.model.park.Spot;
 import com.nbacon.parkingloot.domain.model.vehicle.QVehicle;
@@ -9,6 +10,7 @@ import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
@@ -27,6 +29,64 @@ class SpotRepositoryImpl implements SpotRepositoryCustom {
     public SpotRepositoryImpl(EntityManager em) {
         this.em = em;
         this.queryFactory = new JPAQueryFactory(em);
+    }
+
+    @Override
+    public Optional<Spot> findFirstFreeSpotByType(Class<? extends Spot> spotType, ParkingLot parkingLot) {
+        QSpot spot = QSpot.spot;
+
+        Spot result = queryFactory
+                .selectFrom(spot)
+                .where(spot.parkingLot.id.eq(parkingLot.getId())
+                        .and(spot.vehicle.isNull())
+                        .and(spot.instanceOf(spotType)))
+                .orderBy(spot.position.asc())
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                .fetchFirst();
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
+    public List<Spot> findThreeConsecutiveFreeSpots(Class<? extends Spot> spotType, ParkingLot parkingLot) {
+        QSpot spot1 = new QSpot("spot1");
+        QSpot spot2 = new QSpot("spot2");
+        QSpot spot3 = new QSpot("spot3");
+
+        Integer startPosition = queryFactory
+                .select(spot1.position)
+                .from(spot1)
+                .join(spot2).on(
+                        spot2.parkingLot.id.eq(spot1.parkingLot.id)
+                                .and(spot2.position.eq(spot1.position.add(1)))
+                                .and(spot2.vehicle.isNull())
+                                .and(spot2.instanceOf(spotType))
+                )
+                .join(spot3).on(
+                        spot3.parkingLot.id.eq(spot1.parkingLot.id)
+                                .and(spot3.position.eq(spot1.position.add(2)))
+                                .and(spot3.vehicle.isNull())
+                                .and(spot3.instanceOf(spotType))
+                )
+                .where(spot1.parkingLot.id.eq(parkingLot.getId())
+                        .and(spot1.vehicle.isNull())
+                        .and(spot1.instanceOf(spotType)))
+                .orderBy(spot1.position.asc())
+                .fetchFirst();
+
+        if (startPosition == null) {
+            return List.of();
+        }
+
+        QSpot spot = QSpot.spot;
+        return queryFactory
+                .selectFrom(spot)
+                .where(spot.parkingLot.id.eq(parkingLot.getId())
+                        .and(spot.position.in(startPosition, startPosition + 1, startPosition + 2))
+                        .and(spot.instanceOf(spotType)))
+                .orderBy(spot.position.asc())
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                .fetch();
     }
 
     @Override

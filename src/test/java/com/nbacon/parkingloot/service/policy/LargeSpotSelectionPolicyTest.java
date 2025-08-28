@@ -26,27 +26,27 @@ class LargeSpotSelectionPolicyTest {
         ParkingLot pl = ParkingLot.builder().id(parkingLotId).build();
 
         Spot largeSpot = new LargeSpot();
-        when(repo.findFirstFreeSpotsByTypeOrderByPosition(LargeSpot.class, pl))
+        when(repo.findFirstFreeSpotByType(LargeSpot.class, pl))
                 .thenReturn(Optional.of(largeSpot));
 
         Optional<List<Spot>> a1 = policy.selectAllocation(pl);
         assertTrue(a1.isPresent());
         assertEquals(List.of(largeSpot), a1.get());
 
-        when(repo.findFirstFreeSpotsByTypeOrderByPosition(LargeSpot.class, pl))
+        when(repo.findFirstFreeSpotByType(LargeSpot.class, pl))
                 .thenReturn(Optional.empty());
 
         Spot c1 = new CarSpot();
         Spot c2 = new CarSpot();
         Spot c3 = new CarSpot();
-        when(repo.lockThreeConsecutiveBySpotType(pl.getId(), CarSpot.class))
+        when(repo.findThreeConsecutiveFreeSpots(CarSpot.class, pl))
                 .thenReturn(List.of(c1, c2, c3));
 
         Optional<List<Spot>> a2 = policy.selectAllocation(pl);
         assertTrue(a2.isPresent());
         assertEquals(3, a2.get().size());
 
-        when(repo.lockThreeConsecutiveBySpotType(pl.getId(), CarSpot.class))
+        when(repo.findThreeConsecutiveFreeSpots(CarSpot.class, pl))
                 .thenReturn(List.of(c1, c2)); // pas assez
 
         Optional<List<Spot>> a3 = policy.selectAllocation(pl);

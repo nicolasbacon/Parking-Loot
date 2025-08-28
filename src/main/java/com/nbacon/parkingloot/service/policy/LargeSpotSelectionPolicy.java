@@ -24,12 +24,12 @@ public class LargeSpotSelectionPolicy implements SpotSelectionPolicy {
 
     @Override
     public Optional<List<Spot>> selectAllocation(ParkingLot parkingLot) {
-        Optional<Spot> large = spotRepository.findFirstFreeSpotsByTypeOrderByPosition(LargeSpot.class, parkingLot);
+        Optional<Spot> large = spotRepository.findFirstFreeSpotByType(LargeSpot.class, parkingLot);
         if (large.isPresent()) {
             return Optional.of(List.of(large.get()));
         }
 
-        List<Spot> freeCarSpots = spotRepository.lockThreeConsecutiveBySpotType(parkingLot.getId(), CarSpot.class);
+        List<Spot> freeCarSpots = spotRepository.findThreeConsecutiveFreeSpots(CarSpot.class, parkingLot);
         if (freeCarSpots.size() == 3) {
             return Optional.of(freeCarSpots);
         }

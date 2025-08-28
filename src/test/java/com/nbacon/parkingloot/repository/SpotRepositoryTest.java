@@ -76,7 +76,7 @@ class SpotRepositoryDataJpaTest {
         em.flush();
         em.clear();
 
-        Optional<Spot> firstFree = spotRepository.findFirstFreeSpotsByTypeOrderByPosition(CarSpot.class, lotA);
+        Optional<Spot> firstFree = spotRepository.findFirstFreeSpotByType(CarSpot.class, lotA);
 
         assertTrue(firstFree.isPresent());
         assertEquals(1, firstFree.get().getPosition());
@@ -84,7 +84,7 @@ class SpotRepositoryDataJpaTest {
     }
 
     @Test
-    void lockThreeConsecutiveBySpotType_returnsThreeConsecutiveFreeCarSpots_whenAvailable() {
+    void findThreeConsecutiveBySpotType_returnsThreeConsecutiveFreeCarSpots_whenAvailable() {
         addSpot(lotA, new CarSpot(), 0, null);
         addSpot(lotA, new CarSpot(), 1, null);
         addSpot(lotA, new CarSpot(), 2, null);
@@ -100,15 +100,15 @@ class SpotRepositoryDataJpaTest {
         em.flush();
         em.clear();
 
-        List<Spot> locked = spotRepository.lockThreeConsecutiveBySpotType(lotA.getId(), CarSpot.class);
+        List<Spot> locked = spotRepository.findThreeConsecutiveFreeSpots(CarSpot.class, lotA);
 
-        assertEquals(3, locked.size(), "Devrait retourner 3 places consécutives");
+        assertEquals(3, locked.size());
         assertEquals(List.of(0, 1, 2), locked.stream().map(Spot::getPosition).toList());
         assertTrue(locked.stream().allMatch(s -> s.getParkingLot().getId().equals(lotA.getId())));
     }
 
     @Test
-    void lockThreeConsecutiveBySpotType_returnsEmpty_whenNoThreeConsecutiveFree() {
+    void findThreeConsecutiveBySpotType_returnsEmpty_whenNoThreeConsecutiveFree() {
         addSpot(lotA, new CarSpot(), 0, null);
         addSpot(lotA, new CarSpot(), 1, new Car("X1"));
         addSpot(lotA, new CarSpot(), 2, null);
@@ -118,9 +118,9 @@ class SpotRepositoryDataJpaTest {
         em.flush();
         em.clear();
 
-        List<Spot> locked = spotRepository.lockThreeConsecutiveBySpotType(lotA.getId(), CarSpot.class);
+        List<Spot> locked = spotRepository.findThreeConsecutiveFreeSpots(CarSpot.class, lotA);
 
-        assertTrue(locked.isEmpty(), "Aucune séquence de 3 consécutifs libres ne doit être trouvée");
+        assertTrue(locked.isEmpty());
     }
 
     @Test

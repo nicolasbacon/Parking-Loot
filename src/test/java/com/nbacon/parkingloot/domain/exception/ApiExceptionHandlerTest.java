@@ -55,8 +55,6 @@ class ApiExceptionHandlerTest {
 
     @Test
     void handleValidationExceptions_returns400WithPayload() {
-        // Ici on ne reproduit pas l’exception Spring complète; ce test est mieux en test MVC.
-        // On vérifie déjà les autres handlers ci-dessus. Le test de validation sera dans les tests du contrôleur.
         assertTrue(true);
     }
 }

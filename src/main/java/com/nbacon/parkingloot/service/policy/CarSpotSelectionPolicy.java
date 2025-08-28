@@ -25,11 +25,11 @@ public class CarSpotSelectionPolicy implements SpotSelectionPolicy {
 
     @Override
     public Optional<List<Spot>> selectAllocation(ParkingLot parkingLot) {
-        Optional<Spot> carSpot = spotRepository.findFirstFreeSpotsByTypeOrderByPosition(CarSpot.class, parkingLot);
+        Optional<Spot> carSpot = spotRepository.findFirstFreeSpotByType(CarSpot.class, parkingLot);
         if (carSpot.isPresent()) {
             return Optional.of(List.of(carSpot.get()));
         }
-        Optional<Spot> largeSpot = spotRepository.findFirstFreeSpotsByTypeOrderByPosition(LargeSpot.class, parkingLot);
+        Optional<Spot> largeSpot = spotRepository.findFirstFreeSpotByType(LargeSpot.class, parkingLot);
         return largeSpot.map(List::of);
     }
 }
