@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SpotRepository extends JpaRepository<Spot, Long>, SpotRepositoryCustom {
+public interface SpotRepository extends JpaRepository<Spot, Long>, SpotRepositoryCustom, QuerydslPredicateExecutor<Spot> {
 
     private static String resolveDiscriminator(Class<? extends Spot> type) {
         DiscriminatorValue dv = type.getAnnotation(DiscriminatorValue.class);

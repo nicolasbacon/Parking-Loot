@@ -1,8 +1,13 @@
 package com.nbacon.parkingloot.repository;
 
+import com.nbacon.parkingloot.domain.model.park.QSpot;
 import com.nbacon.parkingloot.domain.model.park.Spot;
+import com.nbacon.parkingloot.domain.model.vehicle.QVehicle;
 import com.nbacon.parkingloot.domain.model.vehicle.Van;
 import com.nbacon.parkingloot.repository.dto.ParkingLotInfos;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -15,27 +20,44 @@ class SpotRepositoryImpl implements SpotRepositoryCustom {
     @PersistenceContext
     private EntityManager em;
 
+    private JPAQueryFactory queryFactory;
+
+    public SpotRepositoryImpl(EntityManager em) {
+        this.em = em;
+        this.queryFactory = new JPAQueryFactory(em);
+    }
+
     @Override
     public ParkingLotInfos fetchParkingLotInfos(long parkingLotId) {
-        Object[] agg = em.createQuery("""
-                            select
-                                           count(s),
-                                           coalesce(sum(case when s.occupied = false then 1 else 0 end), 0),
-                                           coalesce(sum(case when s.occupied = true then 1 else 0 end), 0),
-                                           coalesce(sum(case when s.occupied = true and type(v) = :vanType then 1 else 0 end), 0)
-                                        from Spot s
-                                        left join s.vehicle v
-                                        where s.parkingLot.id = :parkingLotId
-                        """, Object[].class)
-                .setParameter("parkingLotId", parkingLotId)
-                .setParameter("vanType", Van.class)
-                .getSingleResult();
+        QSpot spot = QSpot.spot;
+        QVehicle vehicle = QVehicle.vehicle;
 
-        long total = ((Number) agg[0]).longValue();
-        long free = agg[1] == null ? 0L : ((Number) agg[1]).longValue();
-        long occupied = agg[2] == null ? 0L : ((Number) agg[2]).longValue();
-        long vansAssigned = agg[3] == null ? 0L : ((Number) agg[3]).longValue();
+        NumberExpression<Long> totalCount = spot.count();
+        NumberExpression<Long> freeCount = new CaseBuilder()
+                .when(spot.occupied.isFalse()).then(1L)
+                .otherwise(0L)
+                .sum();
+        NumberExpression<Long> occupiedCount = new CaseBuilder()
+                .when(spot.occupied.isTrue()).then(1L)
+                .otherwise(0L)
+                .sum();
+        NumberExpression<Long> vansAssignedCount = new CaseBuilder()
+                .when(spot.occupied.isTrue().and(vehicle.instanceOf(Van.class)))
+                .then(1L)
+                .otherwise(0L)
+                .sum();
 
+        var result = queryFactory
+                .select(totalCount, freeCount, occupiedCount, vansAssignedCount)
+                .from(spot)
+                .leftJoin(spot.vehicle, vehicle)
+                .where(spot.parkingLot.id.eq(parkingLotId))
+                .fetchOne();
+
+        long total = result.get(totalCount);
+        long free = result.get(freeCount) != null ? result.get(freeCount) : 0L;
+        long occupied = result.get(occupiedCount) != null ? result.get(occupiedCount) : 0L;
+        long vansAssigned = result.get(vansAssignedCount) != null ? result.get(vansAssignedCount) : 0L;
 
         @SuppressWarnings("unchecked")
         List<Class<? extends Spot>> fullyAssignedTypes = em.createQuery("""
@@ -64,4 +86,5 @@ class SpotRepositoryImpl implements SpotRepositoryCustom {
                 (int) vansAssigned
         );
     }
+
 }
