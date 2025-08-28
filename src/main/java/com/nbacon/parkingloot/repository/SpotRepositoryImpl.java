@@ -36,15 +36,15 @@ class SpotRepositoryImpl implements SpotRepositoryCustom {
 
         NumberExpression<Long> totalCount = spot.count();
         NumberExpression<Long> freeCount = new CaseBuilder()
-                .when(spot.occupied.isFalse()).then(1L)
+                .when(spot.vehicle.isNull()).then(1L)
                 .otherwise(0L)
                 .sum();
         NumberExpression<Long> occupiedCount = new CaseBuilder()
-                .when(spot.occupied.isTrue()).then(1L)
+                .when(spot.vehicle.isNotNull()).then(1L)
                 .otherwise(0L)
                 .sum();
         NumberExpression<Long> vansAssignedCount = new CaseBuilder()
-                .when(spot.occupied.isTrue().and(vehicle.instanceOf(Van.class)))
+                .when(spot.vehicle.isNotNull().and(vehicle.instanceOf(Van.class)))
                 .then(1L)
                 .otherwise(0L)
                 .sum();
@@ -68,7 +68,7 @@ class SpotRepositoryImpl implements SpotRepositoryCustom {
                             from Spot s
                             where s.parkingLot.id = :parkingLotId
                             group by type(s)
-                            having coalesce(sum(case when s.occupied = false then 1 else 0 end), 0) = 0
+                            having coalesce(sum(case when s.vehicle IS NULL then 1 else 0 end), 0) = 0
                         """)
                 .setParameter("parkingLotId", parkingLotId)
                 .getResultList();

@@ -50,10 +50,9 @@ class SpotRepositoryDataJpaTest {
         em.flush();
     }
 
-    private <T extends Spot> T addSpot(ParkingLot lot, T spot, int position, boolean occupied, Vehicle vehicle) {
+    private <T extends Spot> T addSpot(ParkingLot lot, T spot, int position, Vehicle vehicle) {
         spot.setParkingLot(lot);
         spot.setPosition(position);
-        spot.setOccupied(occupied);
         if (vehicle != null && vehicle.getId() == null) {
             em.persist(vehicle);
         }
@@ -65,38 +64,38 @@ class SpotRepositoryDataJpaTest {
 
     @Test
     void findFirstFreeSpotsByTypeOrderByPosition_returnsLowestFreePosition_forGivenLot() {
-        addSpot(lotA, new CarSpot(), 0, true, new Car("CAR-A0"));
-        addSpot(lotA, new CarSpot(), 1, false, null);
-        addSpot(lotA, new CarSpot(), 2, true, new Car("CAR-A2"));
-        addSpot(lotA, new CarSpot(), 3, false, null);
-        addSpot(lotA, new CarSpot(), 4, false, null);
+        addSpot(lotA, new CarSpot(), 0, new Car("CAR-A0"));
+        addSpot(lotA, new CarSpot(), 1, null);
+        addSpot(lotA, new CarSpot(), 2, new Car("CAR-A2"));
+        addSpot(lotA, new CarSpot(), 3, null);
+        addSpot(lotA, new CarSpot(), 4, null);
 
-        addSpot(lotB, new CarSpot(), 0, false, null);
-        addSpot(lotB, new CarSpot(), 1, false, null);
+        addSpot(lotB, new CarSpot(), 0, null);
+        addSpot(lotB, new CarSpot(), 1, null);
 
         em.flush();
         em.clear();
 
         Optional<Spot> firstFree = spotRepository.findFirstFreeSpotsByTypeOrderByPosition(CarSpot.class, lotA);
 
-        assertTrue(firstFree.isPresent(), "Une place libre devrait être trouvée");
+        assertTrue(firstFree.isPresent());
         assertEquals(1, firstFree.get().getPosition());
         assertEquals(lotA.getId(), firstFree.get().getParkingLot().getId());
     }
 
     @Test
     void lockThreeConsecutiveBySpotType_returnsThreeConsecutiveFreeCarSpots_whenAvailable() {
-        addSpot(lotA, new CarSpot(), 0, false, null);
-        addSpot(lotA, new CarSpot(), 1, false, null);
-        addSpot(lotA, new CarSpot(), 2, false, null);
-        addSpot(lotA, new CarSpot(), 3, true, new Car("OCC-3"));
-        addSpot(lotA, new CarSpot(), 4, false, null);
-        addSpot(lotA, new CarSpot(), 5, false, null);
-        addSpot(lotA, new CarSpot(), 6, true, new Car("OCC-6"));
+        addSpot(lotA, new CarSpot(), 0, null);
+        addSpot(lotA, new CarSpot(), 1, null);
+        addSpot(lotA, new CarSpot(), 2, null);
+        addSpot(lotA, new CarSpot(), 3, new Car("OCC-3"));
+        addSpot(lotA, new CarSpot(), 4, null);
+        addSpot(lotA, new CarSpot(), 5, null);
+        addSpot(lotA, new CarSpot(), 6, new Car("OCC-6"));
 
-        addSpot(lotB, new CarSpot(), 0, false, null);
-        addSpot(lotB, new CarSpot(), 1, false, null);
-        addSpot(lotB, new CarSpot(), 2, false, null);
+        addSpot(lotB, new CarSpot(), 0, null);
+        addSpot(lotB, new CarSpot(), 1, null);
+        addSpot(lotB, new CarSpot(), 2, null);
 
         em.flush();
         em.clear();
@@ -110,11 +109,11 @@ class SpotRepositoryDataJpaTest {
 
     @Test
     void lockThreeConsecutiveBySpotType_returnsEmpty_whenNoThreeConsecutiveFree() {
-        addSpot(lotA, new CarSpot(), 0, false, null);
-        addSpot(lotA, new CarSpot(), 1, true, new Car("X1"));
-        addSpot(lotA, new CarSpot(), 2, false, null);
-        addSpot(lotA, new CarSpot(), 3, false, null);
-        addSpot(lotA, new CarSpot(), 4, true, new Car("X4"));
+        addSpot(lotA, new CarSpot(), 0, null);
+        addSpot(lotA, new CarSpot(), 1, new Car("X1"));
+        addSpot(lotA, new CarSpot(), 2, null);
+        addSpot(lotA, new CarSpot(), 3, null);
+        addSpot(lotA, new CarSpot(), 4, new Car("X4"));
 
         em.flush();
         em.clear();
@@ -131,13 +130,13 @@ class SpotRepositoryDataJpaTest {
         Vehicle van = new Van("V-1");
         vehicleRepository.saveAll(List.of(moto, car, van));
 
-        addSpot(lotA, new MotorcycleSpot(), 0, true, moto);
-        addSpot(lotA, new MotorcycleSpot(), 1, false, null);
+        addSpot(lotA, new MotorcycleSpot(), 0, moto);
+        addSpot(lotA, new MotorcycleSpot(), 1, null);
 
-        addSpot(lotA, new CarSpot(), 0, true, van);
-        addSpot(lotA, new CarSpot(), 1, true, car);
+        addSpot(lotA, new CarSpot(), 0, van);
+        addSpot(lotA, new CarSpot(), 1, car);
 
-        addSpot(lotA, new LargeSpot(), 0, false, null);
+        addSpot(lotA, new LargeSpot(), 0, null);
 
         em.flush();
         em.clear();
@@ -158,9 +157,9 @@ class SpotRepositoryDataJpaTest {
         Vehicle car = new Car("CAR-XYZ");
         vehicleRepository.save(car);
 
-        Spot s1 = addSpot(lotA, new CarSpot(), 0, true, car);
-        Spot s2 = addSpot(lotA, new LargeSpot(), 0, true, car);
-        addSpot(lotA, new CarSpot(), 1, false, null); // libre, ne doit pas apparaître
+        Spot s1 = addSpot(lotA, new CarSpot(), 0, car);
+        Spot s2 = addSpot(lotA, new LargeSpot(), 0, car);
+        addSpot(lotA, new CarSpot(), 1, null); // libre, ne doit pas apparaître
 
         em.flush();
         em.clear();

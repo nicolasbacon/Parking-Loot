@@ -93,24 +93,22 @@ public class ParkingService {
     }
 
     private void parkVehicleInSpots(Vehicle vehicle, List<Spot> spots) {
-        boolean allFree = spots.stream().noneMatch(Spot::isOccupied);
+        boolean allFree = spots.stream().allMatch(s -> s.getVehicle() == null);
         if (!allFree) {
             throw new NoAvailableSpotException(vehicle.getClass().getSimpleName());
         }
         for (Spot spot : spots) {
             spot.setVehicle(vehicle);
-            spot.setOccupied(true);
         }
     }
 
     private void releaseSpots(List<Spot> spots) {
-        boolean allTaken = spots.stream().allMatch(Spot::isOccupied);
+        boolean allTaken = spots.stream().allMatch(s -> s.getVehicle() != null);
         if (!allTaken) {
             throw new AlreadyFreeSpotException();
         }
         for (Spot spot : spots) {
             spot.setVehicle(null);
-            spot.setOccupied(false);
         }
     }
 

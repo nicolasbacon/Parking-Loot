@@ -12,8 +12,8 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "SPOT_TYPE")
 @Table(name = "SPOT", indexes = {
-        @Index(name = "idx_spot_type_occupied_parking_position",
-                columnList = "SPOT_TYPE, OCCUPIED, PARKING_LOT_ID, POSITION")
+        @Index(name = "idx_spot_type_parking_position",
+                columnList = "SPOT_TYPE, PARKING_LOT_ID, POSITION")
 }, uniqueConstraints = {
         @UniqueConstraint(name = "uk_spot_parking_type_position",
                 columnNames = {"SPOT_TYPE", "PARKING_LOT_ID", "POSITION"})
@@ -26,8 +26,6 @@ public abstract class Spot {
     @GeneratedValue
     @UuidGenerator
     private UUID id;
-
-    private boolean occupied;
 
     private int position;
 

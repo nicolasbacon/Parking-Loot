@@ -30,7 +30,7 @@ public interface SpotRepository extends JpaRepository<Spot, Long>, SpotRepositor
     }
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT s FROM Spot s WHERE TYPE(s) = :type AND s.occupied = false AND s.parkingLot = :parkingLot ORDER BY s.position LIMIT 1")
+    @Query("SELECT s FROM Spot s WHERE TYPE(s) = :type AND s.vehicle IS NULL AND s.parkingLot = :parkingLot ORDER BY s.position LIMIT 1")
     List<Spot> findFreeSpotsByTypeOrderByPosition(@Param("type") Class<? extends Spot> type,
                                                   @Param("parkingLot") ParkingLot parkingLot,
                                                   Pageable pageable);
@@ -48,15 +48,15 @@ public interface SpotRepository extends JpaRepository<Spot, Long>, SpotRepositor
                 JOIN spot s2
                   ON s2.parking_lot_id = s1.parking_lot_id
                  AND s2.position = s1.position + 1
-                 AND s2.occupied = false
+                 AND s2.vehicle_id IS NULL
                  AND s2.spot_type = :spotType
                 JOIN spot s3
                   ON s3.parking_lot_id = s1.parking_lot_id
                  AND s3.position = s1.position + 2
-                 AND s3.occupied = false
+                 AND s3.vehicle_id IS NULL
                  AND s3.spot_type = :spotType
                 WHERE s1.parking_lot_id = :parkingLotId
-                  AND s1.occupied = false
+                  AND s1.vehicle_id IS NULL
                   AND s1.spot_type = :spotType
                 ORDER BY s1.position
                 LIMIT 1
