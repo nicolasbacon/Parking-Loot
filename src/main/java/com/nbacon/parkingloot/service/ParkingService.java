@@ -1,5 +1,6 @@
 package com.nbacon.parkingloot.service;
 
+import com.nbacon.parkingloot.domain.exception.AlreadyFreeSpotException;
 import com.nbacon.parkingloot.domain.exception.NoAvailableSpotException;
 import com.nbacon.parkingloot.domain.exception.ParkingNotFoundException;
 import com.nbacon.parkingloot.domain.exception.VehicleNotFoundException;
@@ -57,10 +58,19 @@ public class ParkingService {
 
         vehicleRepository.save(vehicle);
 
-        for (Spot spot : allocation) {
-            spot.assignTo(vehicle);
-        }
+        parkVehicleInSpots(vehicle, allocation);
         spotRepository.saveAll(allocation);
+    }
+
+    @Transactional
+    public void leave(@Valid OutgoingVehicle outgoingVehicle) {
+        Vehicle vehicle = vehicleRepository.findFirstByLicensePlate(outgoingVehicle.licensePlate());
+        if (vehicle == null) {
+            throw new VehicleNotFoundException("Vehicle not found");
+        }
+        List<Spot> spots = spotRepository.findAllByVehicle(vehicle);
+        releaseSpots(spots);
+        vehicleRepository.delete(vehicle);
     }
 
     @Transactional(readOnly = true)
@@ -81,16 +91,26 @@ public class ParkingService {
 
     }
 
-    @Transactional
-    public void leave(@Valid OutgoingVehicle outgoingVehicle) {
-        Vehicle vehicle = vehicleRepository.findFirstByLicensePlate(outgoingVehicle.licensePlate());
-        if (vehicle == null) {
-            throw new VehicleNotFoundException("Vehicle not found");
+    private void parkVehicleInSpots(Vehicle vehicle, List<Spot> spots) {
+        boolean allFree = spots.stream().noneMatch(Spot::isOccupied);
+        if (!allFree) {
+            throw new NoAvailableSpotException(vehicle.getClass().getSimpleName());
         }
-        List<Spot> spots = spotRepository.findAllByVehicle(vehicle);
         for (Spot spot : spots) {
-            spot.release();
+            spot.setVehicle(vehicle);
+            spot.setOccupied(true);
         }
-        vehicleRepository.delete(vehicle);
     }
+
+    private void releaseSpots(List<Spot> spots) {
+        boolean allTaken = spots.stream().allMatch(Spot::isOccupied);
+        if (!allTaken) {
+            throw new AlreadyFreeSpotException();
+        }
+        for (Spot spot : spots) {
+            spot.setVehicle(null);
+            spot.setOccupied(false);
+        }
+    }
+
 }

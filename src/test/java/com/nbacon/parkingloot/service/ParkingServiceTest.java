@@ -58,20 +58,22 @@ class ParkingServiceTest {
 
     @Test
     void park_success_assignsAndSaves() {
-        long plId = 10L;
-        IncomingVehicle in = new IncomingVehicle("car", "AB-123-CD", plId);
-        ParkingLot pl = ParkingLot.builder().id(plId).build();
-        when(parkingRepo.findById(plId)).thenReturn(Optional.of(pl));
+        long parkingLotId = 10L;
+        IncomingVehicle in = new IncomingVehicle("car", "AB-123-CD", parkingLotId);
+        ParkingLot pl = ParkingLot.builder().id(parkingLotId).build();
+        when(parkingRepo.findById(parkingLotId)).thenReturn(Optional.of(pl));
 
         SpotSelectionPolicy carPolicy = mock(SpotSelectionPolicy.class);
         when(registry.getPolicy(VehicleType.CAR)).thenReturn(carPolicy);
         Spot spot = mock(Spot.class);
+        when(spot.isOccupied()).thenReturn(false);
         when(carPolicy.selectAllocation(pl)).thenReturn(Optional.of(List.of(spot)));
 
         service.park(in);
 
         verify(vehicleRepo).save(any(Vehicle.class));
-        verify(spot).assignTo(any(Vehicle.class));
+        verify(spot).setVehicle(any(Vehicle.class));
+        verify(spot).setOccupied(true);
         verify(spotRepo).saveAll(List.of(spot));
     }
 
@@ -130,12 +132,16 @@ class ParkingServiceTest {
         when(vehicleRepo.findFirstByLicensePlate("AB-123-CD")).thenReturn(v);
         Spot s1 = mock(Spot.class);
         Spot s2 = mock(Spot.class);
+        when(s1.isOccupied()).thenReturn(true);
+        when(s2.isOccupied()).thenReturn(true);
         when(spotRepo.findAllByVehicle(v)).thenReturn(List.of(s1, s2));
 
         service.leave(out);
 
-        verify(s1).release();
-        verify(s2).release();
+        verify(s1).setVehicle(null);
+        verify(s1).setOccupied(false);
+        verify(s2).setVehicle(null);
+        verify(s2).setOccupied(false);
         verify(vehicleRepo).delete(v);
     }
 

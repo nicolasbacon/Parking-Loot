@@ -1,7 +1,5 @@
 package com.nbacon.parkingloot.domain.model.park;
 
-import com.nbacon.parkingloot.domain.exception.AlreadyFreeSpotException;
-import com.nbacon.parkingloot.domain.exception.NoAvailableSpotException;
 import com.nbacon.parkingloot.domain.model.vehicle.Vehicle;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -35,21 +33,5 @@ public abstract class Spot {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARKING_LOT_ID")
     private ParkingLot parkingLot;
-
-    public void assignTo(Vehicle vehicle) {
-        if (this.occupied) {
-            throw new NoAvailableSpotException(vehicle.getClass().getSimpleName());
-        }
-        this.vehicle = vehicle;
-        this.occupied = true;
-    }
-
-    public void release() {
-        if (!this.occupied) {
-            throw new AlreadyFreeSpotException();
-        }
-        this.vehicle = null;
-        this.occupied = false;
-    }
 
 }
