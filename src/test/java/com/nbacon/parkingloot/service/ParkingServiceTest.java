@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -58,7 +59,7 @@ class ParkingServiceTest {
 
     @Test
     void park_success_assignsAndSaves() {
-        long parkingLotId = 10L;
+        UUID parkingLotId = UUID.randomUUID();
         IncomingVehicle in = new IncomingVehicle("car", "AB-123-CD", parkingLotId);
         ParkingLot pl = ParkingLot.builder().id(parkingLotId).build();
         when(parkingRepo.findById(parkingLotId)).thenReturn(Optional.of(pl));
@@ -79,8 +80,9 @@ class ParkingServiceTest {
 
     @Test
     void park_whenParkingNotFound_throwsParkingNotFoundException() {
-        IncomingVehicle in = new IncomingVehicle("van", "V-1", 999L);
-        when(parkingRepo.findById(999L)).thenReturn(Optional.empty());
+        UUID parkingLotId = UUID.randomUUID();
+        IncomingVehicle in = new IncomingVehicle("van", "V-1", parkingLotId);
+        when(parkingRepo.findById(parkingLotId)).thenReturn(Optional.empty());
 
         assertThrows(ParkingNotFoundException.class, () -> service.park(in));
         verifyNoInteractions(spotRepo, vehicleRepo);
@@ -88,10 +90,10 @@ class ParkingServiceTest {
 
     @Test
     void park_whenNoAllocation_throwsNoAvailableSpotException() {
-        long plId = 11L;
-        IncomingVehicle in = new IncomingVehicle("motorcycle", "M-1", plId);
-        ParkingLot pl = ParkingLot.builder().id(plId).build();
-        when(parkingRepo.findById(plId)).thenReturn(Optional.of(pl));
+        UUID parkingLotId = UUID.randomUUID();
+        IncomingVehicle in = new IncomingVehicle("motorcycle", "M-1", parkingLotId);
+        ParkingLot pl = ParkingLot.builder().id(parkingLotId).build();
+        when(parkingRepo.findById(parkingLotId)).thenReturn(Optional.of(pl));
 
         SpotSelectionPolicy motoPolicy = mock(SpotSelectionPolicy.class);
         when(registry.getPolicy(VehicleType.MOTORCYCLE)).thenReturn(motoPolicy);
@@ -103,7 +105,7 @@ class ParkingServiceTest {
 
     @Test
     void getAllParkingInformation_success_mapsDto() {
-        long plId = 12L;
+        UUID plId = UUID.randomUUID();
         ParkingLot pl = ParkingLot.builder().id(plId).build();
         when(parkingRepo.findById(plId)).thenReturn(Optional.of(pl));
 
@@ -121,8 +123,9 @@ class ParkingServiceTest {
 
     @Test
     void getAllParkingInformation_whenParkingNotFound_throws() {
-        when(parkingRepo.findById(404L)).thenReturn(Optional.empty());
-        assertThrows(ParkingNotFoundException.class, () -> service.getAllParkingInformation(404L));
+        UUID parkingLotId = UUID.randomUUID();
+        when(parkingRepo.findById(parkingLotId)).thenReturn(Optional.empty());
+        assertThrows(ParkingNotFoundException.class, () -> service.getAllParkingInformation(parkingLotId));
     }
 
     @Test

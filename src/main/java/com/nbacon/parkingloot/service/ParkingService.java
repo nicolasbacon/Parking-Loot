@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +75,7 @@ public class ParkingService {
     }
 
     @Transactional(readOnly = true)
-    public ParkingLotInfosResponse getAllParkingInformation(long parkingLotId) {
+    public ParkingLotInfosResponse getAllParkingInformation(UUID parkingLotId) {
         parkingLotRepository.findById(parkingLotId)
                 .orElseThrow(() -> new ParkingNotFoundException(parkingLotId));
 

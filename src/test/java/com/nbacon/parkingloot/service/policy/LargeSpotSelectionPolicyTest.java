@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,7 +22,8 @@ class LargeSpotSelectionPolicyTest {
     void selectAllocation_largeFirst_elseThreeConsecutiveCarSpots() {
         SpotRepository repo = mock(SpotRepository.class);
         LargeSpotSelectionPolicy policy = new LargeSpotSelectionPolicy(repo);
-        ParkingLot pl = ParkingLot.builder().id(42L).build();
+        UUID parkingLotId = UUID.randomUUID();
+        ParkingLot pl = ParkingLot.builder().id(parkingLotId).build();
 
         Spot largeSpot = new LargeSpot();
         when(repo.findFirstFreeSpotsByTypeOrderByPosition(LargeSpot.class, pl))

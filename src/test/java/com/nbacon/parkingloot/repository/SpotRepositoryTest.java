@@ -88,7 +88,7 @@ class SpotRepositoryDataJpaTest {
     void lockThreeConsecutiveBySpotType_returnsThreeConsecutiveFreeCarSpots_whenAvailable() {
         addSpot(lotA, new CarSpot(), 0, false, null);
         addSpot(lotA, new CarSpot(), 1, false, null);
-        addSpot(lotA, new CarSpot(), 2, false, null); // premier triplet consécutif libre (0,1,2)
+        addSpot(lotA, new CarSpot(), 2, false, null);
         addSpot(lotA, new CarSpot(), 3, true, new Car("OCC-3"));
         addSpot(lotA, new CarSpot(), 4, false, null);
         addSpot(lotA, new CarSpot(), 5, false, null);

@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,7 +23,8 @@ class ApiExceptionHandlerTest {
 
     @Test
     void handleParkingNotFound_returns404() {
-        ResponseEntity<String> resp = handler.handleParkingNotFound(new ParkingNotFoundException(42L));
+        UUID parkingLotId = UUID.randomUUID();
+        ResponseEntity<String> resp = handler.handleParkingNotFound(new ParkingNotFoundException(parkingLotId));
         assertEquals(404, resp.getStatusCode().value());
         Assertions.assertNotNull(resp.getBody());
         assertTrue(resp.getBody().contains("No parking available"));

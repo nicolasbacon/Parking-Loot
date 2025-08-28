@@ -1,7 +1,7 @@
 services:
 
   app:
-    image: parking-loot:latest
+    image: parking-loot:arm64
     container_name: parkingloot-app
     depends_on:
       - mariadb

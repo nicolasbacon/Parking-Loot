@@ -6,11 +6,12 @@ import com.nbacon.parkingloot.dto.request.ParkingCreateRequest;
 import com.nbacon.parkingloot.dto.response.ParkingLotInfosResponse;
 import com.nbacon.parkingloot.service.ParkingService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/parking")
@@ -21,8 +22,7 @@ public class ParkingController {
     @GetMapping("/infos/{parkingLotId}")
     public ParkingLotInfosResponse infos(
             @PathVariable
-            @Positive(message = "parkingLotId must be strictly positive")
-            long parkingLotId
+            UUID parkingLotId
     ) {
         return parkingService.getAllParkingInformation(parkingLotId);
     }

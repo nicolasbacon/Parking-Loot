@@ -13,6 +13,8 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 class SpotRepositoryImpl implements SpotRepositoryCustom {
@@ -20,7 +22,7 @@ class SpotRepositoryImpl implements SpotRepositoryCustom {
     @PersistenceContext
     private EntityManager em;
 
-    private JPAQueryFactory queryFactory;
+    private final JPAQueryFactory queryFactory;
 
     public SpotRepositoryImpl(EntityManager em) {
         this.em = em;
@@ -28,7 +30,7 @@ class SpotRepositoryImpl implements SpotRepositoryCustom {
     }
 
     @Override
-    public ParkingLotInfos fetchParkingLotInfos(long parkingLotId) {
+    public ParkingLotInfos fetchParkingLotInfos(UUID parkingLotId) {
         QSpot spot = QSpot.spot;
         QVehicle vehicle = QVehicle.vehicle;
 
@@ -54,10 +56,11 @@ class SpotRepositoryImpl implements SpotRepositoryCustom {
                 .where(spot.parkingLot.id.eq(parkingLotId))
                 .fetchOne();
 
-        long total = result.get(totalCount);
-        long free = result.get(freeCount) != null ? result.get(freeCount) : 0L;
-        long occupied = result.get(occupiedCount) != null ? result.get(occupiedCount) : 0L;
-        long vansAssigned = result.get(vansAssignedCount) != null ? result.get(vansAssignedCount) : 0L;
+        assert result != null;
+        long total = Optional.ofNullable(result.get(totalCount)).orElse(0L);
+        long free = Optional.ofNullable(result.get(freeCount)).orElse(0L);
+        long occupied = Optional.ofNullable(result.get(occupiedCount)).orElse(0L);
+        long vansAssigned = Optional.ofNullable(result.get(vansAssignedCount)).orElse(0L);
 
         @SuppressWarnings("unchecked")
         List<Class<? extends Spot>> fullyAssignedTypes = em.createQuery("""

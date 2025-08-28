@@ -19,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,11 +41,12 @@ class ParkingControllerTest {
 
     @Test
     void infos_success() throws Exception {
-        Mockito.when(service.getAllParkingInformation(1L)).thenReturn(
+        UUID parkingLotId = UUID.randomUUID();
+        Mockito.when(service.getAllParkingInformation(parkingLotId)).thenReturn(
                 new ParkingLotInfosResponse(3, 10, false, true, List.of("LargeSpot"), 1)
         );
 
-        mvc.perform(get("/parking/infos/{parkingLotId}", 1))
+        mvc.perform(get("/parking/infos/{parkingLotId}", parkingLotId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nbSpotRemaining").value(3))
                 .andExpect(jsonPath("$.isEmpty").value(true));
@@ -58,10 +60,11 @@ class ParkingControllerTest {
 
     @Test
     void infos_parkingNotFound_maps404() throws Exception {
-        Mockito.when(service.getAllParkingInformation(99L))
-                .thenThrow(new ParkingNotFoundException(99L));
+        UUID parkingLotId = UUID.randomUUID();
+        Mockito.when(service.getAllParkingInformation(parkingLotId))
+                .thenThrow(new ParkingNotFoundException(parkingLotId));
 
-        mvc.perform(get("/parking/infos/{parkingLotId}", 99))
+        mvc.perform(get("/parking/infos/{parkingLotId}", parkingLotId))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(containsString("No parking available")));
     }
@@ -92,7 +95,8 @@ class ParkingControllerTest {
 
     @Test
     void park_success() throws Exception {
-        IncomingVehicle req = new IncomingVehicle("car", "AB-123-CD", 1L);
+        UUID parkingLotId = UUID.randomUUID();
+        IncomingVehicle req = new IncomingVehicle("car", "AB-123-CD", parkingLotId);
 
         mvc.perform(post("/parking/park")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -118,7 +122,8 @@ class ParkingControllerTest {
         Mockito.doThrow(new VehicleTypeNotFoundException("plane"))
                 .when(service).park(any(IncomingVehicle.class));
 
-        IncomingVehicle req = new IncomingVehicle("plane", "X", 1L);
+        UUID parkingLotId = UUID.randomUUID();
+        IncomingVehicle req = new IncomingVehicle("plane", "X", parkingLotId);
         mvc.perform(post("/parking/park")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(req)))
@@ -131,7 +136,8 @@ class ParkingControllerTest {
         Mockito.doThrow(new NoAvailableSpotException("CAR"))
                 .when(service).park(any(IncomingVehicle.class));
 
-        IncomingVehicle req = new IncomingVehicle("car", "X", 1L);
+        UUID parkingLotId = UUID.randomUUID();
+        IncomingVehicle req = new IncomingVehicle("car", "X", parkingLotId);
         mvc.perform(post("/parking/park")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(req)))
@@ -175,10 +181,11 @@ class ParkingControllerTest {
 
     @Test
     void park_parkingNotFound_maps404() throws Exception {
-        Mockito.doThrow(new ParkingNotFoundException(77L))
+        UUID parkingLotId = UUID.randomUUID();
+        Mockito.doThrow(new ParkingNotFoundException(parkingLotId))
                 .when(service).park(any(IncomingVehicle.class));
 
-        IncomingVehicle req = new IncomingVehicle("car", "AB-123-CD", 77L);
+        IncomingVehicle req = new IncomingVehicle("car", "AB-123-CD", parkingLotId);
         mvc.perform(post("/parking/park")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(req)))

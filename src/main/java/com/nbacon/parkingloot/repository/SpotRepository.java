@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface SpotRepository extends JpaRepository<Spot, Long>, SpotRepositoryCustom, QuerydslPredicateExecutor<Spot> {
@@ -68,10 +69,10 @@ public interface SpotRepository extends JpaRepository<Spot, Long>, SpotRepositor
             ORDER BY s.position
             FOR UPDATE SKIP LOCKED
             """, nativeQuery = true)
-    List<Spot> lockThreeConsecutiveBySpotType(@Param("parkingLotId") long parkingLotId,
+    List<Spot> lockThreeConsecutiveBySpotType(@Param("parkingLotId") UUID parkingLotId,
                                               @Param("spotType") String spotType);
 
-    default List<Spot> lockThreeConsecutiveBySpotType(long parkingLotId, Class<? extends Spot> type) {
+    default List<Spot> lockThreeConsecutiveBySpotType(UUID parkingLotId, Class<? extends Spot> type) {
         return lockThreeConsecutiveBySpotType(parkingLotId, resolveDiscriminator(type));
     }
 
