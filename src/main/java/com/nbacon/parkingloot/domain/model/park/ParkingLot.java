@@ -33,9 +33,9 @@ public class ParkingLot {
         addSpots(LargeSpot::new, nbLargeSpot);
     }
 
-    private void addSpots(Supplier<? extends Spot> constructeur, int nombre) {
-        for (int i = 0; i < nombre; i++) {
-            Spot spot = constructeur.get();
+    private void addSpots(Supplier<? extends Spot> constructor, int count) {
+        for (int i = 0; i < count; i++) {
+            Spot spot = constructor.get();
             spot.setParkingLot(this);
             spot.setPosition(i);
             this.spots.add(spot);
