@@ -7,8 +7,9 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface SpotRepository extends JpaRepository<Spot, Long>, SpotRepositoryCustom, QuerydslPredicateExecutor<Spot> {
+public interface SpotRepository extends JpaRepository<Spot, UUID>, SpotRepositoryCustom, QuerydslPredicateExecutor<Spot> {
     List<Spot> findAllByVehicle(Vehicle vehicle);
 }
